@@ -2,6 +2,7 @@ import './globals.css';
 import React from 'react';
 import Script from 'next/script';
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next"
 import { Navigation } from '@/components/common/Navigation';
 import { Footer } from '@/components/common/Footer';
 
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
         <Navigation />
         <main className="min-h-[calc(100dvh-131px)] max-h-full">{children}</main>
+        <Analytics/>
         <Footer />
       </body>
     </html>
