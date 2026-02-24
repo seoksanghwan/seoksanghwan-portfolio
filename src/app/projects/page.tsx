@@ -2,7 +2,7 @@ import { getBlogPosts } from '@/lib/notion';
 import { ProjectList, ProjectListSkeleton } from '@/components/ProjectList';
 import { Suspense } from 'react';
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function ProjectsPage() {
   const posts = await getBlogPosts();
