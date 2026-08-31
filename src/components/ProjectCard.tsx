@@ -10,9 +10,6 @@ type ProjectCardProps = {
   size?: 'lg' | 'sm';
 };
 
-// 이 너비보다 작은 원본 이미지는 카드 크기로 확대될 때 깨져 보이므로 렌더링하지 않는다.
-const LOW_RES_WIDTH_THRESHOLD = 400;
-
 function highlightPercentages(text: string) {
   return text.split(/(\d+(?:\.\d+)?%)/g).map((part, i) =>
     /^\d+(?:\.\d+)?%$/.test(part) ? (
@@ -27,18 +24,15 @@ function highlightPercentages(text: string) {
 
 export const ProjectCard = ({ project, onClick, size = 'lg' }: ProjectCardProps) => {
   const [imgError, setImgError] = useState(false);
-  const [isLowRes, setIsLowRes] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const isCompact = size === 'sm';
-  const showImage = !!project.coverImage && !imgError && !isLowRes;
+  const showImage = !!project.coverImage && !imgError;
   const visibleTags = project.tags.slice(0, isCompact ? 2 : 4);
   const hiddenTagCount = project.tags.length - visibleTags.length;
 
   const evaluateImage = (img: HTMLImageElement) => {
     if (img.naturalWidth === 0) {
       setImgError(true);
-    } else if (img.naturalWidth < LOW_RES_WIDTH_THRESHOLD) {
-      setIsLowRes(true);
     }
   };
 
