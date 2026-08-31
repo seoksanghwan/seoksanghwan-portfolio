@@ -74,7 +74,7 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
           type="button"
           onClick={() => setIsFilterOpen((prev) => !prev)}
           aria-expanded={isFilterOpen}
-          className="flex items-center gap-[0.6rem] text-[1.4rem] text-[#aaa] hover:text-mint transition-colors cursor-pointer"
+          className="flex items-center gap-[0.8rem] px-[1.4rem] py-[0.7rem] rounded-full border border-[#d8d8d8] text-[1.5rem] font-medium text-[#444] hover:border-mint hover:text-[#18181c] transition-colors cursor-pointer"
         >
           필터{selectedTags.length > 0 ? ` (${selectedTags.length})` : ''}
           <span className={clsx('transition-transform', isFilterOpen && 'rotate-180')}>▾</span>
@@ -88,7 +88,7 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
 
       {featured.length > 0 && (
         <div>
-          <h2 className="flex items-center gap-[0.8rem] text-white text-[1.8rem] font-bold mb-[1.6rem]">
+          <h2 className="flex items-center gap-[0.8rem] text-[#18181c] text-[1.8rem] font-bold mb-[1.6rem]">
             <span className="w-[4px] h-[1.6rem] bg-mint rounded-full" />
             주요 프로젝트
           </h2>
@@ -106,9 +106,9 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
       )}
 
       {others.length > 0 && (
-        <div className="pt-[2rem] border-t border-white/10">
-          <h2 className="flex items-center gap-[0.8rem] text-white text-[1.8rem] font-bold mb-[1.6rem]">
-            <span className="w-[4px] h-[1.6rem] bg-[#555] rounded-full" />
+        <div className="pt-[2rem] border-t border-[#e5e5e5]">
+          <h2 className="flex items-center gap-[0.8rem] text-[#18181c] text-[1.8rem] font-bold mb-[1.6rem]">
+            <span className="w-[4px] h-[1.6rem] bg-[#999] rounded-full" />
             그 외 작업
           </h2>
           <ul className="grid grid-cols-2 md:grid-cols-3 gap-[16px]">
@@ -125,7 +125,7 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
       )}
 
       {filteredPosts.length === 0 && (
-        <p className="text-center text-[#aaa] text-[1.6rem] py-[4rem]">
+        <p className="text-center text-[#666] text-[1.6rem] py-[4rem]">
           선택한 태그에 해당하는 프로젝트가 없습니다.
         </p>
       )}
