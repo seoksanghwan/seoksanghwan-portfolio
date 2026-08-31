@@ -14,6 +14,7 @@ type ProjectModalProps = {
 export const ProjectModal = ({ project, onClose }: ProjectModalProps) => {
   const [markdown, setMarkdown] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     fetch(`/api/project-md?id=${project.id}`)
@@ -38,10 +39,11 @@ export const ProjectModal = ({ project, onClose }: ProjectModalProps) => {
       >
         <ModalCloseButton onClose={onClose} />
 
-        {project.coverImage && (
+        {project.coverImage && !imgError && (
           <div className="w-full mx-auto bg-white h-[350px] overflow-hidden max-md:w-[calc(100%+40px)] max-md:mx-auto max-md:mb-[3rem] max-md:h-[200px]">
             <img
               src={project.coverImage}
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover block"
               alt=""
             />

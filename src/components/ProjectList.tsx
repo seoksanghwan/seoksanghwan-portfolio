@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ProjectPost } from '@/types';
 import { ProjectModal } from './ProjectModal/index';
 import { ProjectCard } from './ProjectCard';
+import { TagFilter } from './TagFilter';
 
 export const ProjectListSkeleton = () => (
   <section className="max-w-[1200px] mx-auto">
@@ -17,18 +19,91 @@ export const ProjectListSkeleton = () => (
 
 export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
   const [selectedProject, setSelectedProject] = useState<ProjectPost | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const selectedTags = useMemo(() => {
+    const raw = searchParams.get('tags');
+    return raw ? raw.split(',').filter(Boolean) : [];
+  }, [searchParams]);
+
+  const allTags = useMemo(
+    () => Array.from(new Set(posts.flatMap((p) => p.tags))).sort((a, b) => a.localeCompare(b)),
+    [posts],
+  );
+
+  const handleToggleTag = useCallback(
+    (tag: string) => {
+      const next = selectedTags.includes(tag)
+        ? selectedTags.filter((t) => t !== tag)
+        : [...selectedTags, tag];
+
+      const params = new URLSearchParams(searchParams.toString());
+      if (next.length > 0) {
+        params.set('tags', next.join(','));
+      } else {
+        params.delete('tags');
+      }
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [selectedTags, searchParams, router, pathname],
+  );
+
+  const filteredPosts = useMemo(
+    () =>
+      selectedTags.length === 0
+        ? posts
+        : posts.filter((p) => p.tags.some((t) => selectedTags.includes(t))),
+    [posts, selectedTags],
+  );
+
+  const featured = filteredPosts.filter((p) => p.featured);
+  const others = filteredPosts.filter((p) => !p.featured);
 
   return (
-    <section className="max-w-[1200px] mx-auto">
-      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
-        {posts.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            onClick={() => setSelectedProject(project)}
-          />
-        ))}
-      </ul>
+    <section className="max-w-[1200px] mx-auto flex flex-col gap-[4.8rem]">
+      <TagFilter tags={allTags} selectedTags={selectedTags} onToggle={handleToggleTag} />
+
+      {featured.length > 0 && (
+        <div>
+          <h2 className="text-white text-[1.8rem] font-bold mb-[1.6rem]">주요 프로젝트</h2>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+            {featured.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                size="lg"
+                onClick={() => setSelectedProject(project)}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {others.length > 0 && (
+        <div>
+          <h2 className="text-white text-[1.8rem] font-bold mb-[1.6rem]">그 외 작업</h2>
+          <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[16px]">
+            {others.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                size="sm"
+                onClick={() => setSelectedProject(project)}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {filteredPosts.length === 0 && (
+        <p className="text-center text-[#aaa] text-[1.6rem] py-[4rem]">
+          선택한 태그에 해당하는 프로젝트가 없습니다.
+        </p>
+      )}
+
       {selectedProject && (
         <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
       )}

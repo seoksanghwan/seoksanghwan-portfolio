@@ -27,13 +27,18 @@ function mapNotionPageToPost(page: any): ProjectPost {
     id,
     title: properties.Name?.title[0]?.plain_text || '제목 없음',
     description: properties.Description?.rich_text[0]?.plain_text || '',
-    coverImage: cover?.file?.url || cover?.external?.url || null,
+    // cover.file은 1시간 후 만료되는 서명된 S3 URL이라 직접 노출하지 않고
+    // /api/cover-image 프록시를 거쳐 매 요청마다 최신 URL로 다시 확인한다.
+    // cover.external은 만료되지 않으므로 그대로 사용한다.
+    coverImage: cover?.file ? `/api/cover-image?pageId=${id}` : cover?.external?.url || null,
     url: properties.URL?.url || '',
     youtube: properties.Youtube?.url || '',
     tags: properties.Tag?.multi_select?.map((tag: any) => tag.name) || [],
     startDate: properties['Work Period']?.date?.start || '',
     endDate: properties['Work Period']?.date?.end || '',
     notionUrl,
+    featured: properties.Featured?.checkbox || false,
+    priority: properties.Priority?.number ?? 999,
   };
 }
 
@@ -51,10 +56,14 @@ export const getBlogPosts = async (): Promise<ProjectPost[]> => {
         data_source_id: databaseId,
         sorts: [
           {
-            property: 'Work Period',
-            direction: 'descending',
+            property: 'Priority',
+            direction: 'ascending',
           },
         ],
+        filter: {
+          property: 'Priority',
+          number: { less_than: 999 },
+        },
       });
 
       return (response.results as any[]).map(mapNotionPageToPost);
@@ -100,5 +109,16 @@ export const getProjectDetail = async (pageId: string) => {
   } catch (error) {
     console.error('SDK Detail Error:', error);
     throw error;
+  }
+};
+
+// 6. 커버 이미지의 최신 서명 URL 조회 (S3 서명 URL은 발급 후 약 1시간 뒤 만료됨)
+export const getCoverImageUrl = async (pageId: string): Promise<string | null> => {
+  try {
+    const page = (await notion.pages.retrieve({ page_id: pageId })) as any;
+    return page.cover?.file?.url || page.cover?.external?.url || null;
+  } catch (error) {
+    console.error('커버 이미지 조회 실패:', error);
+    return null;
   }
 };

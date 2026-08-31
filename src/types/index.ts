@@ -9,6 +9,8 @@ export interface ProjectPost {
   endDate: string;
   notionUrl: string;
   youtube?: string;
+  featured: boolean;
+  priority: number;
 }
 
 export interface CareerTask {
