@@ -14,7 +14,7 @@ const baseClass =
 export const NavLink = ({ href, children }: NavLinkProps) => {
   const pathname = usePathname();
   const isActive = pathname === href;
-  const activeClass = isActive ? 'text-[#ffbc2b] font-bold underline' : '';
+  const activeClass = isActive ? 'underline' : '';
 
   return (
     <Link href={href} className={`${baseClass} ${activeClass}`}>

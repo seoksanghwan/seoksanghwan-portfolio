@@ -17,11 +17,16 @@ export const getDuration = (
   const start = new Date(sYear, sMonth - 1);
 
   let end: Date;
+  // 재직 중일 때 end는 아직 끝나지 않은 이번 달의 특정 하루(오늘)이므로,
+  // 퇴사월까지 포함해 세는 +1 보정을 적용하면 안 된다.
+  let inclusive: boolean;
   if (isGoing) {
     end = new Date();
+    inclusive = false;
   } else if (endDateStr) {
     const [eYear, eMonth] = endDateStr.split('.').map(Number);
     end = new Date(eYear, eMonth - 1);
+    inclusive = true;
   } else {
     return '';
   }
@@ -34,12 +39,14 @@ export const getDuration = (
     months += 12;
   }
 
-  // 입사월과 퇴사월을 모두 포함하기 위해 1개월 추가
-  months += 1;
+  if (inclusive) {
+    // 입사월과 퇴사월을 모두 포함하기 위해 1개월 추가
+    months += 1;
 
-  if (months >= 12) {
-    years += 1;
-    months -= 12;
+    if (months >= 12) {
+      years += 1;
+      months -= 12;
+    }
   }
 
   const yearText = years > 0 ? `${years}년 ` : '';

@@ -5,6 +5,8 @@ import {
   SkillsSection,
   CareerSection,
   AboutIntro,
+  Highlights,
+  EducationSection,
 } from '@/components/about';
 
 export default function AboutPage() {
@@ -15,6 +17,7 @@ export default function AboutPage() {
 
         <AboutSection title="자기 소개">
           <AboutIntro />
+          <Highlights />
         </AboutSection>
 
         <AboutSection title="기술 스택">
@@ -23,6 +26,10 @@ export default function AboutPage() {
 
         <AboutSection title="경력">
           <CareerSection careers={careerData} />
+        </AboutSection>
+
+        <AboutSection title="학력 및 기타">
+          <EducationSection />
         </AboutSection>
       </div>
     </div>
