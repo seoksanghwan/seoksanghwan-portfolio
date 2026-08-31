@@ -7,6 +7,14 @@ export const careerData: Career[] = [
     endDate: null,
     isGoing: true,
     tasks: [
+       {
+        service: 'Marvelous Designer 프론트엔드 전면 개편 (2026.09 오픈 예정)',
+        period: '2026.05 – 2026.09',
+        descriptions: [
+          '프론트엔드 개발자 2인 체제에서 클라이언트 사이드 개발을 주도적으로 담당, 전면 리뉴얼 아키텍처 설계부터 구현까지 이끌고 있음',
+          'Claude Code·Cursor에 프로젝트 전용 rule과 skill을 구축해 코드 컨벤션 자동 적용 및 반복 작업 처리 속도를 높이는 AI 협업 워크플로우 설계 및 운영',
+        ],
+      },
       {
         service: '글로벌 결제 및 복합 구독 파이프라인 아키텍처 설계',
         period: '2020.04 – 2025.09',
