@@ -68,7 +68,7 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
   const others = filteredPosts.filter((p) => !p.featured);
 
   return (
-    <section className="max-w-[1200px] mx-auto flex flex-col gap-[3rem]">
+    <section className="max-w-[1200px] mx-auto flex flex-col gap-[2rem]">
       <div>
         <button
           type="button"
@@ -88,7 +88,10 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
 
       {featured.length > 0 && (
         <div>
-          <h2 className="text-white text-[1.8rem] font-bold mb-[1.6rem]">주요 프로젝트</h2>
+          <h2 className="flex items-center gap-[0.8rem] text-white text-[1.8rem] font-bold mb-[1.6rem]">
+            <span className="w-[4px] h-[1.6rem] bg-mint rounded-full" />
+            주요 프로젝트
+          </h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
             {featured.map((project) => (
               <ProjectCard
@@ -103,9 +106,12 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
       )}
 
       {others.length > 0 && (
-        <div>
-          <h2 className="text-white text-[1.8rem] font-bold mb-[1.6rem]">그 외 작업</h2>
-          <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[16px]">
+        <div className="pt-[2rem] border-t border-white/10">
+          <h2 className="flex items-center gap-[0.8rem] text-white text-[1.8rem] font-bold mb-[1.6rem]">
+            <span className="w-[4px] h-[1.6rem] bg-[#555] rounded-full" />
+            그 외 작업
+          </h2>
+          <ul className="grid grid-cols-2 md:grid-cols-3 gap-[16px]">
             {others.map((project) => (
               <ProjectCard
                 key={project.id}

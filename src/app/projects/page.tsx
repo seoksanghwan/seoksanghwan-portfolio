@@ -8,7 +8,7 @@ export default async function ProjectsPage() {
   const posts = await getBlogPosts();
 
   return (
-    <div className="max-w-[1200px] mx-auto px-6 py-12">
+    <div className="max-w-[1200px] mx-auto px-6 pt-6 pb-12">
       <Suspense fallback={<ProjectListSkeleton />}>
         <ProjectList posts={posts} />
       </Suspense>

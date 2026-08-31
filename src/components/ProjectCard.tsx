@@ -30,6 +30,8 @@ export const ProjectCard = ({ project, onClick, size = 'lg' }: ProjectCardProps)
   const [isLowRes, setIsLowRes] = useState(false);
   const isCompact = size === 'sm';
   const showImage = !!project.coverImage && !imgError && !isLowRes;
+  const visibleTags = project.tags.slice(0, isCompact ? 2 : 4);
+  const hiddenTagCount = project.tags.length - visibleTags.length;
 
   return (
     <li
@@ -89,7 +91,7 @@ export const ProjectCard = ({ project, onClick, size = 'lg' }: ProjectCardProps)
           {highlightPercentages(project.description)}
         </p>
         <div className="flex flex-wrap gap-2 mt-auto">
-          {(isCompact ? project.tags.slice(0, 2) : project.tags).map((tag) => (
+          {visibleTags.map((tag) => (
             <span
               key={tag}
               className={clsx(
@@ -100,6 +102,16 @@ export const ProjectCard = ({ project, onClick, size = 'lg' }: ProjectCardProps)
               #{tag}
             </span>
           ))}
+          {hiddenTagCount > 0 && (
+            <span
+              className={clsx(
+                'bg-transparent text-[#777] rounded-[4px]',
+                isCompact ? 'px-[0.4rem] py-[0.3rem] text-[0.9rem]' : 'px-[0.4rem] py-[0.4rem] text-[1rem]',
+              )}
+            >
+              +{hiddenTagCount}
+            </span>
+          )}
         </div>
       </div>
     </li>
