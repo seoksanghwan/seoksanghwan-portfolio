@@ -15,6 +15,7 @@ export interface ProjectPost {
 
 export interface CareerTask {
   service: string;
+  period: string;
   descriptions: string[];
 }
 

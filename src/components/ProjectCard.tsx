@@ -10,18 +10,8 @@ type ProjectCardProps = {
   size?: 'lg' | 'sm';
 };
 
-function hashString(str: string) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return Math.abs(hash);
-}
-
-function getPlaceholderGradient(project: ProjectPost) {
-  const hue = hashString(project.tags[0] || project.title) % 360;
-  return `linear-gradient(135deg, hsl(${hue}, 70%, 55%) 0%, #0d1117 100%)`;
-}
+// 이 너비보다 작은 원본 이미지는 카드 크기로 확대될 때 깨져 보이므로 렌더링하지 않는다.
+const LOW_RES_WIDTH_THRESHOLD = 400;
 
 function highlightPercentages(text: string) {
   return text.split(/(\d+(?:\.\d+)?%)/g).map((part, i) =>
@@ -37,57 +27,61 @@ function highlightPercentages(text: string) {
 
 export const ProjectCard = ({ project, onClick, size = 'lg' }: ProjectCardProps) => {
   const [imgError, setImgError] = useState(false);
+  const [isLowRes, setIsLowRes] = useState(false);
   const isCompact = size === 'sm';
-  const showImage = !!project.coverImage && !imgError;
+  const showImage = !!project.coverImage && !imgError && !isLowRes;
 
   return (
     <li
       onClick={onClick}
       className={clsx(
-        'group relative rounded-[10px] shadow-lg overflow-hidden cursor-pointer bg-[#18181c]/80',
-        isCompact ? 'h-[150px]' : 'h-[224px]',
+        'group relative rounded-[10px] shadow-lg overflow-hidden cursor-pointer bg-gradient-to-br',
+        isCompact ? 'h-[160px] from-[#15171c] to-[#0a0b0d]' : 'h-[240px] from-[#1f232c] to-[#0f1115]',
       )}
     >
-      {showImage && (
+      {showImage ? (
         <img
           src={project.coverImage!}
           alt={project.title}
           onError={() => setImgError(true)}
-          className="w-full h-full object-cover transition-all duration-300 group-hover:scale-110 blur-sm"
+          onLoad={(e) => {
+            if (e.currentTarget.naturalWidth > 0 && e.currentTarget.naturalWidth < LOW_RES_WIDTH_THRESHOLD) {
+              setIsLowRes(true);
+            }
+          }}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
-      )}
-      {!showImage && (
-        <div
-          className="relative w-full h-full bg-center transition-all duration-300 group-hover:scale-110 blur-sm"
-          style={{ background: getPlaceholderGradient(project) }}
-        >
-          <span
-            className={clsx(
-              'absolute inset-0 flex items-center justify-center font-black text-white/15 select-none',
-              isCompact ? 'text-[3.5rem]' : 'text-[7rem]',
-            )}
-          >
-            {project.title.trim().charAt(0)}
-          </span>
-        </div>
-      )}
-      <div
-        className={clsx(
-          'absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#18181c] text-center opacity-80',
-          isCompact ? 'gap-2 p-4' : 'gap-4 p-6',
-        )}
-      >
-        <h3
+      ) : (
+        <span
           className={clsx(
-            'text-white break-keep text-center font-bold',
-            isCompact ? 'text-[1.5rem]' : 'text-[2rem]',
+            'absolute inset-0 flex items-center justify-center font-black text-white/10 select-none',
+            isCompact ? 'text-[3.5rem]' : 'text-[7rem]',
           )}
         >
+          {Array.from(project.title.trim())[0]}
+        </span>
+      )}
+
+      {/* 텍스트 가독성 확보를 위한 최소한의 하단 그라데이션 스크림 */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+
+      <div
+        className={clsx(
+          'absolute inset-0 z-10 flex flex-col justify-end items-center text-center',
+          isCompact ? 'gap-[0.6rem] p-4' : 'gap-3 p-6',
+        )}
+      >
+        <h3 className={clsx('text-white break-keep font-bold', isCompact ? 'text-[1.5rem]' : 'text-[2rem]')}>
           {project.title}
         </h3>
-        {!isCompact && (
-          <p className="text-white text-[1.4rem] break-keep">{highlightPercentages(project.description)}</p>
-        )}
+        <p
+          className={clsx(
+            'text-white/90 text-left self-stretch break-keep',
+            isCompact ? 'text-[1.2rem] line-clamp-2' : 'text-[1.4rem]',
+          )}
+        >
+          {highlightPercentages(project.description)}
+        </p>
         <div className="flex flex-wrap justify-center gap-2">
           {(isCompact ? project.tags.slice(0, 2) : project.tags).map((tag) => (
             <span

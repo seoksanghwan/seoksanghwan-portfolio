@@ -12,7 +12,7 @@ export const TagFilter = ({ tags, selectedTags, onToggle }: TagFilterProps) => {
   if (tags.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-[0.8rem] mb-[3.2rem]">
+    <div className="flex flex-wrap gap-[0.8rem]">
       {tags.map((tag) => {
         const active = selectedTags.includes(tag);
         return (

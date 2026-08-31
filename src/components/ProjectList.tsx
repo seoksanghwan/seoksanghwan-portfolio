@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import clsx from 'clsx';
 import { ProjectPost } from '@/types';
 import { ProjectModal } from './ProjectModal/index';
 import { ProjectCard } from './ProjectCard';
@@ -33,6 +34,10 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
     [posts],
   );
 
+  // 태그가 많으면 필터 목록이 첫 화면 전체를 덮어버리므로 기본은 접어두고,
+  // 공유된 필터 링크로 들어온 경우에만 펼쳐서 보여준다.
+  const [isFilterOpen, setIsFilterOpen] = useState(() => selectedTags.length > 0);
+
   const handleToggleTag = useCallback(
     (tag: string) => {
       const next = selectedTags.includes(tag)
@@ -63,8 +68,23 @@ export const ProjectList = ({ posts }: { posts: ProjectPost[] }) => {
   const others = filteredPosts.filter((p) => !p.featured);
 
   return (
-    <section className="max-w-[1200px] mx-auto flex flex-col gap-[4.8rem]">
-      <TagFilter tags={allTags} selectedTags={selectedTags} onToggle={handleToggleTag} />
+    <section className="max-w-[1200px] mx-auto flex flex-col gap-[3rem]">
+      <div>
+        <button
+          type="button"
+          onClick={() => setIsFilterOpen((prev) => !prev)}
+          aria-expanded={isFilterOpen}
+          className="flex items-center gap-[0.6rem] text-[1.4rem] text-[#aaa] hover:text-mint transition-colors cursor-pointer"
+        >
+          필터{selectedTags.length > 0 ? ` (${selectedTags.length})` : ''}
+          <span className={clsx('transition-transform', isFilterOpen && 'rotate-180')}>▾</span>
+        </button>
+        {isFilterOpen && (
+          <div className="mt-[1.2rem]">
+            <TagFilter tags={allTags} selectedTags={selectedTags} onToggle={handleToggleTag} />
+          </div>
+        )}
+      </div>
 
       {featured.length > 0 && (
         <div>
