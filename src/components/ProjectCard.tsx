@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ProjectPost } from '@/types';
 import clsx from 'clsx';
 
@@ -28,10 +28,28 @@ function highlightPercentages(text: string) {
 export const ProjectCard = ({ project, onClick, size = 'lg' }: ProjectCardProps) => {
   const [imgError, setImgError] = useState(false);
   const [isLowRes, setIsLowRes] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
   const isCompact = size === 'sm';
   const showImage = !!project.coverImage && !imgError && !isLowRes;
   const visibleTags = project.tags.slice(0, isCompact ? 2 : 4);
   const hiddenTagCount = project.tags.length - visibleTags.length;
+
+  const evaluateImage = (img: HTMLImageElement) => {
+    if (img.naturalWidth === 0) {
+      setImgError(true);
+    } else if (img.naturalWidth < LOW_RES_WIDTH_THRESHOLD) {
+      setIsLowRes(true);
+    }
+  };
+
+  useEffect(() => {
+    // 하이드레이션이 끝나기 전에 이미지 로드가 이미 성공/실패해버리면
+    // onLoad/onError 이벤트를 놓칠 수 있어, 마운트 시점에 한 번 더 확인한다.
+    if (imgRef.current?.complete) {
+      evaluateImage(imgRef.current);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project.coverImage]);
 
   return (
     <li
@@ -50,14 +68,11 @@ export const ProjectCard = ({ project, onClick, size = 'lg' }: ProjectCardProps)
       >
         {showImage ? (
           <img
+            ref={imgRef}
             src={project.coverImage!}
             alt={project.title}
-            onError={() => setImgError(true)}
-            onLoad={(e) => {
-              if (e.currentTarget.naturalWidth > 0 && e.currentTarget.naturalWidth < LOW_RES_WIDTH_THRESHOLD) {
-                setIsLowRes(true);
-              }
-            }}
+            onError={(e) => evaluateImage(e.currentTarget)}
+            onLoad={(e) => evaluateImage(e.currentTarget)}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (

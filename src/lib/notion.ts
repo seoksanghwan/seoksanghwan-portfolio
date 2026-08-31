@@ -30,7 +30,8 @@ function mapNotionPageToPost(page: any): ProjectPost {
     // cover.file은 1시간 후 만료되는 서명된 S3 URL이라 직접 노출하지 않고
     // /api/cover-image 프록시를 거쳐 매 요청마다 최신 URL로 다시 확인한다.
     // cover.external은 만료되지 않으므로 그대로 사용한다.
-    coverImage: cover?.file ? `/api/cover-image?pageId=${id}` : cover?.external?.url || null,
+    // 지정된 커버가 없는 페이지는 프록시가 본문 첫 이미지를 대신 찾아준다.
+    coverImage: cover?.external?.url || `/api/cover-image?pageId=${id}`,
     url: properties.URL?.url || '',
     youtube: properties.Youtube?.url || '',
     tags: properties.Tag?.multi_select?.map((tag: any) => tag.name) || [],
@@ -113,10 +114,17 @@ export const getProjectDetail = async (pageId: string) => {
 };
 
 // 6. 커버 이미지의 최신 서명 URL 조회 (S3 서명 URL은 발급 후 약 1시간 뒤 만료됨)
+// 페이지에 지정된 커버가 없으면, 직접 첨부한 이미지를 못 찾는 문제를 막기 위해
+// 본문에 있는 첫 번째 이미지 블록을 대신 사용한다.
 export const getCoverImageUrl = async (pageId: string): Promise<string | null> => {
   try {
     const page = (await notion.pages.retrieve({ page_id: pageId })) as any;
-    return page.cover?.file?.url || page.cover?.external?.url || null;
+    if (page.cover?.file?.url) return page.cover.file.url;
+    if (page.cover?.external?.url) return page.cover.external.url;
+
+    const blocks = await notion.blocks.children.list({ block_id: pageId, page_size: 20 });
+    const imageBlock = (blocks.results as any[]).find((block) => block.type === 'image');
+    return imageBlock?.image?.file?.url || imageBlock?.image?.external?.url || null;
   } catch (error) {
     console.error('커버 이미지 조회 실패:', error);
     return null;
