@@ -9,11 +9,11 @@ export const highlights = [
   },
   {
     metric: '로딩 40% · 빌드 30% 개선',
-    description: 'Lambda@Edge 파이프라인, Next.js 마이그레이션 리딩',
+    description: 'Lambda@Edge 파이프라인 설계, Next.js 마이그레이션 리딩',
   },
   {
     metric: '컴포넌트 재사용률 50% 향상',
-    description: 'Storybook·Chromatic 기반 디자인 시스템 설계',
+    description: 'Storybook·Chromatic 기반 디자인 시스템 아키텍처 설계',
   },
   {
     metric: '운영 리소스 연간 150시간 절감',
